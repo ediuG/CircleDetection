@@ -11,9 +11,13 @@ while True:
     if ret:
         # Our operations on the frame come here
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray_blur = cv2.GaussianBlur(gray, (15, 15), 2, 2)
-        circles = cv2.HoughCircles(gray_blur, cv.CV_HOUGH_GRADIENT, 1.5, 350,
-                                   param1=50, param2=10, minRadius=0, maxRadius=0)
+        gray_blur = cv2.GaussianBlur(gray, (9, 9), 2, 2)
+
+        # param_1 : Upper threshold for the internal Canny edge detector
+        # param_2 : Threshold for center detection.
+        circles = cv2.HoughCircles(gray_blur, cv.CV_HOUGH_GRADIENT, 1, 20,
+                                   param1=20, param2=100, minRadius=0, maxRadius=70)
+
         if circles is not None:
             circles = np.uint16(np.around(circles))
 
