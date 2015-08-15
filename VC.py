@@ -2,9 +2,13 @@ import numpy as np
 import cv2
 import cv2.cv as cv
 
-cap = cv2.VideoCapture(0)
+
+
+cap = cv2.VideoCapture(1)
 
 while True:
+    ret = cap.set(3, 1920)
+    ret = cap.set(4, 1080)
     # Capture frame-by-frame
     ret, frame = cap.read()
 
@@ -12,11 +16,10 @@ while True:
         # Our operations on the frame come here
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray_blur = cv2.GaussianBlur(gray, (9, 9), 2, 2)
-
         # param_1 : Upper threshold for the internal Canny edge detector
         # param_2 : Threshold for center detection.
-        circles = cv2.HoughCircles(gray_blur, cv.CV_HOUGH_GRADIENT, 1, 20,
-                                   param1=20, param2=100, minRadius=0, maxRadius=70)
+        circles = cv2.HoughCircles(gray_blur, cv.CV_HOUGH_GRADIENT, 1, 5,
+                                   param1=150, param2=35, minRadius=1, maxRadius=60)
 
         if circles is not None:
             circles = np.uint16(np.around(circles))
@@ -30,7 +33,7 @@ while True:
         # Display the resulting frame
         # cv2.imshow('frame', gray)
         cv2.imshow('color', frame)
-        cv2.imshow('blur', gray_blur)
+        # cv2.imshow('blur', gray_blur)
     else:
         continue
 
@@ -39,3 +42,4 @@ while True:
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
+
