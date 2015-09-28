@@ -2,44 +2,83 @@ import numpy as np
 import cv2
 import cv2.cv as cv
 
+cap = cv2.VideoCapture(0)
+ret = cap.set(3, 1280)
+ret = cap.set(4, 720)
+
+print cap.get(5)
+
+def unsharp_mask(img):
+	tmp = cv2.GaussianBlur(img, (5, 5), 5)
+	cv2.addWeighted(img, 1.5, tmp, -0.5, 0, img)
+	return img
 
 
-cap = cv2.VideoCapture(1)
+def nothing(x):
+	pass
+
+
+cv2.namedWindow("Track bar")
+cv2.createTrackbar("Hough resolution", "Track bar", 1, 100, nothing)
+cv2.createTrackbar("Canny threshold", "Track bar", 240, 300, nothing)
+cv2.createTrackbar("Accumulator threshold", "Track bar", 90, 200, nothing)
+cv2.createTrackbar("Min radius", "Track bar", 10, 50, nothing)
+cv2.createTrackbar("Max radius", "Track bar", 60, 200, nothing)
 
 while True:
-    ret = cap.set(3, 1920)
-    ret = cap.set(4, 1080)
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+	print cap.get(2)
+	# Capture frame-by-frame
+	ret, frame = cap.read()
 
-    if ret:
-        # Our operations on the frame come here
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray_blur = cv2.GaussianBlur(gray, (9, 9), 2, 2)
-        # param_1 : Upper threshold for the internal Canny edge detector
-        # param_2 : Threshold for center detection.
-        circles = cv2.HoughCircles(gray_blur, cv.CV_HOUGH_GRADIENT, 1, 5,
-                                   param1=150, param2=35, minRadius=1, maxRadius=60)
+	if ret:
+		# get current position of trackbars
+		hough_resolution = cv2.getTrackbarPos("Hough resolution", "Track bar")
+		canny_threshold = cv2.getTrackbarPos("Canny threshold", "Track bar")
+		accumulator_threshold = cv2.getTrackbarPos("Accumulator threshold", "Track bar")
+		minRadius = cv2.getTrackbarPos("Min radius", "Track bar")
+		maxRadius = cv2.getTrackbarPos("Max radius", "Track bar")
 
-        if circles is not None:
-            circles = np.uint16(np.around(circles))
+		# Our operations on the frame come here
+		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+		gray_blur = cv2.GaussianBlur(gray, (9, 9), 4, 4)
+		sharp = unsharp_mask(gray_blur)
+		# param_1 : Upper threshold for the internal Canny edge detector
+		# param_2 : Threshold for center detection.
+		circles = cv2.HoughCircles(sharp, cv.CV_HOUGH_GRADIENT, 2.5, 720 / 4,
+		                           param1=canny_threshold, param2=accumulator_threshold, minRadius=minRadius,
+		                           maxRadius=maxRadius)
 
-            for i in circles[0, :]:
-                # draw the outer circle
-                cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
-                # draw the center of the circle
-                cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
+		# pyrmidal_filter = cv2.pyrMeanShiftFiltering(frame, 10, 10)
+		# pyr_gray = cv2.cvtColor(pyrmidal_filter, cv2.COLOR_BGR2GRAY)
+		# sharp = unsharp_mask(pyr_gray)
+		# circles = cv2.HoughCircles(sharp, cv.CV_HOUGH_GRADIENT, 2, 200,
+		#                            param1=200, param2=50, minRadius=0, maxRadius=30)
+		if circles is not None:
+			circles = np.uint16(np.around(circles))
 
-        # Display the resulting frame
-        # cv2.imshow('frame', gray)
-        cv2.imshow('color', frame)
-        # cv2.imshow('blur', gray_blur)
-    else:
-        continue
+			for i in circles[0, :]:
+				# draw the outer circle
+				cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+				# draw the center of the circle
+				cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+				# for i in circles[0, :]:
+				#     # draw the outer circle
+				#     cv2.circle(sharp, (i[0], i[1]), i[2], (0, 255, 0), 2)
+				#     # draw the center of the circle
+				#     cv2.circle(sharp, (i[0], i[1]), 2, (0, 0, 255), 3)
+
+		# Display the resulting frame
+		# cv2.imshow('Gray', gray)
+		# cv2.imshow('Blur', gray_blur)
+		cv2.imshow('Color', frame)
+		# cv2.imshow('Sharp', sharp)
+
+	else:
+		continue
+
+	if cv2.waitKey(1) & 0xFF == ord('q'):
+		break
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
-
