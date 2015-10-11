@@ -32,12 +32,12 @@ def search_for_movement(threshold_image):
 	if object_detected:
 		# the largest contour is found at the end of the contours vector
 		#we will simply assume that the biggest contour is the object we are looking for.
-		largestContourVec.push_back(contours.at(contours.size()-1))
+		largest_contour_vec.push_back(contours.at(contours.size()-1))
 		# make a bounding rectangle around the largest contour then find its centroid
 		# this will be the object's final estimated position.
-		objectBoundingRectangle = cv2.boundingRect(largestContourVec.at(0))
-		xpos = objectBoundingRectangle.x+objectBoundingRectangle.width/2
-		ypos = objectBoundingRectangle.y+objectBoundingRectangle.height/2
+		object_bounding_rectangle = cv2.boundingRect(largest_contour_vec.at(0))
+		xpos = object_bounding_rectangle.x+object_bounding_rectangle.width/2
+		ypos = object_bounding_rectangle.y+object_bounding_rectangle.height/2
 
 		# update the objects positions by changing the 'theObject' array values
 		theObject[0] = xpos
@@ -45,6 +45,7 @@ def search_for_movement(threshold_image):
 
 	x = theObject[0]
 	y = theObject[1]
+
 
 cv2.namedWindow("Track bar")
 cv2.createTrackbar("Hough resolution", "Track bar", 1, 100, nothing)
@@ -106,9 +107,9 @@ while True:
 		continue
 
 	if cv2.waitKey(1) & 0xFF == ord('p'):
-		pause = False
+		pause = True
 		while pause is True:
-			if cv2.waitKey(1) & 0xFF == ord('p'):
+			if cv2.waitKey() & 0xFF == ord('p'):
 				break
 	elif cv2.waitKey(1) & 0xFF == ord('q'):
 		break
