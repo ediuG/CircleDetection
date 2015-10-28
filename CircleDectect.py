@@ -3,11 +3,12 @@ import cv2
 import cv2.cv as cv
 
 pause = False
-cap = cv2.VideoCapture(0)
-ret = cap.set(3, 1280)
-ret = cap.set(4, 720)
+cap = cv2.VideoCapture(1)
+cap.set(3, 1280)
+cap.set(4, 720)
 
 theObject = [0, 0]
+
 
 def unsharp_mask(img):
 	tmp = cv2.GaussianBlur(img, (5, 5), 5)
