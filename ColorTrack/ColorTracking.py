@@ -12,6 +12,7 @@ cap.set(4, 720)
 mask = np.zeros((600, 800, 3), np.uint8)
 new = np.zeros((600, 800, 3), np.uint8)
 
+
 def nothing(x):
 	pass
 
@@ -24,11 +25,6 @@ def is_ball_increase(before, after):
 		return True
 	else:
 		return False
-
-
-def wall_draw():
-	drawed_circle = cv2.circle(frame, (i[0], i[1]), i[2], (0, 0, 0), -1)
-	cv2.add(drawed_circle, frame)
 
 
 class Ball(object):
@@ -62,17 +58,10 @@ cv2.createTrackbar(
 cv2.createTrackbar("Min radius", "Hough Circles Track bar", 5, 50, nothing)
 cv2.createTrackbar("Max radius", "Hough Circles Track bar", 60, 200, nothing)
 
-# cv2.namedWindow("Track bar")
-# cv2.createTrackbar("H_MIN", "Track bar", 0, 180, nothing)
-# cv2.createTrackbar("H_MAX", "Track bar", 180, 180, nothing)
-# cv2.createTrackbar("S_MIN", "Track bar", 0, 256, nothing)
-# cv2.createTrackbar("S_MAX", "Track bar", 256, 256, nothing)
-# cv2.createTrackbar("V_MIN", "Track bar", 0, 256, nothing)
-# cv2.createTrackbar("V_MAX", "Track bar", 256, 256, nothing)
-
 ball_before = 0
 new_ball = False
 bounce = 0
+
 while True:
 	hough_resolution = cv2.getTrackbarPos(
 		"Hough resolution", "Hough Circles Track bar")
@@ -83,16 +72,9 @@ while True:
 	minRadius = cv2.getTrackbarPos("Min radius", "Hough Circles Track bar")
 	maxRadius = cv2.getTrackbarPos("Max radius", "Hough Circles Track bar")
 
-	# H_MIN = cv2.getTrackbarPos("H_MIN", "Track bar")
-	# H_MAX = cv2.getTrackbarPos("H_MAX", "Track bar")
-	# S_MIN = cv2.getTrackbarPos("S_MIN", "Track bar")
-	# S_MAX = cv2.getTrackbarPos("S_MAX", "Track bar")
-	# V_MIN = cv2.getTrackbarPos("V_MIN", "Track bar")
-	# V_MAX = cv2.getTrackbarPos("V_MAX", "Track bar")
 	ret, frame = cap.read()
 	if ret:
 		hsv_image = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-		# hsv_range = cv2.inRange(hsv_image, cv.Scalar(H_MIN, S_MIN, V_MIN), cv.Scalar(H_MAX, S_MAX, V_MAX))
 		hsv_blue = cv2.inRange(hsv_image, blue_color_hsv_min, blue_color_hsv_max)
 		hsv_red = cv2.inRange(hsv_image, red_color_hsv_min, red_color_hsv_max)
 		hsv_orange = cv2.inRange(hsv_image, orange_color_hsv_min, orange_color_hsv_max)
@@ -106,7 +88,6 @@ while True:
 		str_el = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
 		open_morphed = cv2.morphologyEx(green_yellow_blue_orange_hsv, cv2.MORPH_OPEN, str_el)
 		morphed = cv2.morphologyEx(open_morphed, cv2.MORPH_CLOSE, str_el)
-		# cv2.imshow('morph', morphed)
 
 		hsv_blur = cv2.GaussianBlur(morphed, (7, 7), 4, 4)
 		cv2.imshow('blur', hsv_blur)
@@ -139,10 +120,6 @@ while True:
 		draw_str(frame, (20, 20), 'ball count: %d' % ball_count)
 		draw_str(frame, (20, 40), 'bounce: %d' % bounce)
 		new = cv2.addWeighted(frame, 1, mask, 0.5, 0)
-		# cv2.imshow('color', frame)
-		# cv2.imshow('hsv', green_yellow_blue_orange_hsv)
-		# cv2.imshow('hsv', hsv_image)
-		# print(ball_count)
 		cv2.imshow('new', new)
 	else:
 		continue
