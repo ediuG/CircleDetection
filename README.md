@@ -1,4 +1,4 @@
-# CircleDetection
+# CircleDetection with OpenCV
 
 ###Python
 - **version** 2.7
