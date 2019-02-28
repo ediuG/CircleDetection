@@ -1,7 +1,7 @@
 # CircleDetection with OpenCV
 
-###Python
+### Python
 - **version** 2.7
 
-###OpenCV
+### OpenCV
 - **version** 2.5.4
