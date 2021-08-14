@@ -4,10 +4,12 @@ import cv2.cv as cv
 
 pause = False
 cap = cv2.VideoCapture(0)
-ret = cap.set(3, 1280)
-ret = cap.set(4, 720)
+# ret = cap.set(3, 1280)
+# ret = cap.set(4, 720)
+ret = cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+ret = cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
-theObject = [0, 0]
+the_object = [0, 0]
 
 def unsharp_mask(img):
 	tmp = cv2.GaussianBlur(img, (5, 5), 5)
@@ -39,12 +41,12 @@ def search_for_movement(threshold_image):
 		xpos = object_bounding_rectangle.x+object_bounding_rectangle.width/2
 		ypos = object_bounding_rectangle.y+object_bounding_rectangle.height/2
 
-		# update the objects positions by changing the 'theObject' array values
-		theObject[0] = xpos
-		theObject[1] = ypos
+		# update the objects positions by changing the 'the_object' array values
+		the_object[0] = xpos
+		the_object[1] = ypos
 
-	x = theObject[0]
-	y = theObject[1]
+	x = the_object[0]
+	y = the_object[1]
 
 
 cv2.namedWindow("Track bar")
@@ -64,8 +66,8 @@ while True:
 		hough_resolution = cv2.getTrackbarPos("Hough resolution", "Track bar")
 		canny_threshold = cv2.getTrackbarPos("Canny threshold", "Track bar")
 		accumulator_threshold = cv2.getTrackbarPos("Accumulator threshold", "Track bar")
-		minRadius = cv2.getTrackbarPos("Min radius", "Track bar")
-		maxRadius = cv2.getTrackbarPos("Max radius", "Track bar")
+		min_radius = cv2.getTrackbarPos("Min radius", "Track bar")
+		max_radius = cv2.getTrackbarPos("Max radius", "Track bar")
 
 		# Our operations on the frame come here
 		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -74,14 +76,14 @@ while True:
 		# param_1 : Upper threshold for the internal Canny edge detector
 		# param_2 : Threshold for center detection.
 		circles = cv2.HoughCircles(sharp, cv.CV_HOUGH_GRADIENT, 2.5, 720 / 4,
-								   param1=canny_threshold, param2=accumulator_threshold, minRadius=minRadius,
-								   maxRadius=maxRadius)
+								   param1=canny_threshold, param2=accumulator_threshold, min_radius=min_radius,
+								   max_radius=max_radius)
 
 		# pyrmidal_filter = cv2.pyrMeanShiftFiltering(frame, 10, 10)
 		# pyr_gray = cv2.cvtColor(pyrmidal_filter, cv2.COLOR_BGR2GRAY)
 		# sharp = unsharp_mask(pyr_gray)
 		# circles = cv2.HoughCircles(sharp, cv.CV_HOUGH_GRADIENT, 2, 200,
-		#                            param1=200, param2=50, minRadius=0, maxRadius=30)
+		#                            param1=200, param2=50, min_radius=0, max_radius=30)
 		if circles is not None:
 			circles = np.uint16(np.around(circles))
 
